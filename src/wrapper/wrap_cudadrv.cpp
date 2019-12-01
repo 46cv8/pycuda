@@ -260,7 +260,7 @@ namespace
     py_buffer_wrapper buf_wrapper;
     buf_wrapper.get(dest.ptr(), PyBUF_ANY_CONTIGUOUS | PyBUF_WRITABLE);
 
-    CUDAPP_CALL_GUARDED_THREADED(cuMemcpyAtoH, 
+    CUDAPP_CALL_GUARDED_THREADED(cuMemcpyAtoH,
         (buf_wrapper.m_buf.buf, ary.handle(), index, buf_wrapper.m_buf.len));
   }
 
@@ -1100,6 +1100,13 @@ BOOST_PYTHON_MODULE(_driver)
 #if CUDAPP_CUDA_VERSION >= 4000
       .DEF_SIMPLE_METHOD(can_access_peer)
 #endif
+#if CUDAPP_CUDA_VERSION >= 7000
+      .def("retain_primary_context", &cl::retain_primary_context,
+          (py::args("self")))
+      .def("release_primary_context", &cl::release_primary_context,
+          (py::args("self")))
+#endif
+
       ;
   }
   // }}}
@@ -1348,7 +1355,7 @@ BOOST_PYTHON_MODULE(_driver)
 
     wrp
       .DEF_SIMPLE_METHOD(get_device_pointer)
-      .def("attach", &cl::attach, 
+      .def("attach", &cl::attach,
         (py::arg("mem_flags"), py::arg("stream")=py::object()))
       ;
   }
